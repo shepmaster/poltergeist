@@ -58,6 +58,10 @@ module Capybara::Poltergeist
       command :attributes
     end
 
+    def position
+      (command :position).tap { |p| STDERR.puts "[#{page_id}, #{id}] Is at #{p}" }
+    end
+
     def value
       command :value
     end
@@ -68,7 +72,11 @@ module Capybara::Poltergeist
         when 'radio'
           click
         when 'checkbox'
-          click if value != checked?
+          unless value != checked?
+            STDERR.puts "Already checked!"
+          else
+            without_moving { click }
+          end
         when 'file'
           files = value.respond_to?(:to_ary) ? value.to_ary.map(&:to_s) : value.to_s
           command :select_file, files
@@ -110,6 +118,19 @@ module Capybara::Poltergeist
 
     def disabled?
       command :disabled?
+    end
+
+    def without_moving
+      prev_position = position
+      result = yield
+      next_position = position
+      if prev_position == next_position
+        STDERR.puts "[#{page_id}, #{id}] Stayed at #{prev_position}"
+        result
+      else
+        STDERR.puts "[#{page_id}, #{id}] Moved from #{prev_position} to #{next_position}"
+        raise ObsoleteNode.new(self, "the element moved during a position-specific action")
+      end
     end
 
     def click

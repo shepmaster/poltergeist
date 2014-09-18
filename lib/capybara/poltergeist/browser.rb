@@ -84,6 +84,10 @@ module Capybara::Poltergeist
       command 'attribute', page_id, id, name.to_s
     end
 
+    def position(page_id, id)
+      command 'position', page_id, id
+    end
+
     def value(page_id, id)
       command 'value', page_id, id
     end

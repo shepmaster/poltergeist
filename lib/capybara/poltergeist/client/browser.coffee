@@ -253,6 +253,10 @@ class Poltergeist.Browser
           this.sendResponse(position: @last_mouse_event)
     , 5
 
+  position: (page_id, id) ->
+    rect = this.node(page_id, id).position()
+    this.sendResponse(rect)
+
   click: (page_id, id) ->
     this.mouse_event page_id, id, 'click'
 
